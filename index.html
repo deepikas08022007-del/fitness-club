@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% macro opt(v, name, value, label) -%}
+  <option value="{{ value }}"{% if v[name] == value %} selected{% endif %}>{{ label }}</option>
+{%- endmacro %}
+
+{% block body %}
+<section class="hero wrap">
+  <p class="eyebrow">Powered by Gemini</p>
+  <h1>Your personal AI trainer,<br><span class="accent">ready in seconds.</span></h1>
+  <p class="lead">Tell FitBuddy about your body, goal and schedule. Get a structured weekly workout plan,
+    calorie and macro targets, meal ideas and recovery tips tailored to you.</p>
+</section>
+
+<section class="wrap narrow">
+  <form class="card form" method="post" action="/generate" novalidate>
+    <h2>Build your plan</h2>
+
+    {% if error %}<p class="form-error" role="alert">{{ error }}</p>{% endif %}
+
+    <div class="grid2">
+      <label class="field">Name <span class="opt">(optional)</span>
+        <input type="text" name="name" maxlength="60" autocomplete="given-name" placeholder="Alex" value="{{ v.name }}">
+      </label>
+      <label class="field">Age
+        <input type="number" name="age" min="14" max="90" required placeholder="28" value="{{ v.age }}">
+      </label>
+      <label class="field">Gender
+        <select name="gender" required>
+          {{ opt(v, 'gender', 'male', 'Male') }}
+          {{ opt(v, 'gender', 'female', 'Female') }}
+          {{ opt(v, 'gender', 'other', 'Other / prefer not to say') }}
+        </select>
+      </label>
+      <label class="field">Height (cm)
+        <input type="number" name="height_cm" min="100" max="250" step="0.1" required placeholder="172" value="{{ v.height_cm }}">
+      </label>
+      <label class="field">Weight (kg)
+        <input type="number" name="weight_kg" min="30" max="300" step="0.1" required placeholder="70" value="{{ v.weight_kg }}">
+      </label>
+      <label class="field">Primary goal
+        <select name="goal" required>
+          {{ opt(v, 'goal', 'weight_loss', 'Weight loss') }}
+          {{ opt(v, 'goal', 'muscle_gain', 'Muscle gain') }}
+          {{ opt(v, 'goal', 'general_wellness', 'General wellness') }}
+          {{ opt(v, 'goal', 'endurance', 'Endurance') }}
+          {{ opt(v, 'goal', 'strength', 'Strength') }}
+        </select>
+      </label>
+      <label class="field">Activity level
+        <select name="activity_level">
+          {{ opt(v, 'activity_level', 'sedentary', 'Sedentary (desk job)') }}
+          {{ opt(v, 'activity_level', 'light', 'Light (1-2 workouts/wk)') }}
+          {{ opt(v, 'activity_level', 'moderate', 'Moderate (3-4 workouts/wk)') }}
+          {{ opt(v, 'activity_level', 'active', 'Active (5-6 workouts/wk)') }}
+          {{ opt(v, 'activity_level', 'very_active', 'Very active (athlete)') }}
+        </select>
+      </label>
+      <label class="field">Experience
+        <select name="experience">
+          {{ opt(v, 'experience', 'beginner', 'Beginner') }}
+          {{ opt(v, 'experience', 'intermediate', 'Intermediate') }}
+          {{ opt(v, 'experience', 'advanced', 'Advanced') }}
+        </select>
+      </label>
+      <label class="field">Training days / week
+        <select name="days_per_week">
+          {% for d in range(1, 8) %}{{ opt(v, 'days_per_week', d|string, d) }}{% endfor %}
+        </select>
+      </label>
+      <label class="field">Minutes per session
+        <select name="session_minutes">
+          {% for m in [20, 30, 45, 60, 75, 90] %}{{ opt(v, 'session_minutes', m|string, m) }}{% endfor %}
+        </select>
+      </label>
+      <label class="field">Equipment
+        <select name="equipment">
+          {{ opt(v, 'equipment', 'none', 'None (bodyweight)') }}
+          {{ opt(v, 'equipment', 'home_basic', 'Home (dumbbells/bands)') }}
+          {{ opt(v, 'equipment', 'gym', 'Full gym') }}
+        </select>
+      </label>
+      <label class="field">Diet preference
+        <select name="diet">
+          {{ opt(v, 'diet', 'no_preference', 'No preference') }}
+          {{ opt(v, 'diet', 'vegetarian', 'Vegetarian') }}
+          {{ opt(v, 'diet', 'vegan', 'Vegan') }}
+          {{ opt(v, 'diet', 'eggetarian', 'Eggetarian') }}
+          {{ opt(v, 'diet', 'pescatarian', 'Pescatarian') }}
+        </select>
+      </label>
+    </div>
+
+    <label class="field">Injuries, conditions or allergies <span class="opt">(optional)</span>
+      <textarea name="limitations" rows="2" maxlength="300" placeholder="e.g. mild knee pain, peanut allergy">{{ v.limitations }}</textarea>
+    </label>
+
+    <button class="btn btn-primary" type="submit">Generate my plan</button>
+    <p class="fine">Generating a plan can take 10-20 seconds, so please wait after you click. FitBuddy gives general
+      fitness guidance, not medical advice. Check with a doctor before starting a new programme.</p>
+  </form>
+</section>
+{% endblock %}
